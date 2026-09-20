@@ -32,4 +32,22 @@ public class AuthService {
         System.out.println("Unable to Registered Account, please try again.");
         return false;
     }
+
+    // for login by using phone number and pin
+    public User user_login(String phone_number,int pin) {
+        User login_acc = user_dao.findByPhoneNumber(phone_number);
+        // Check if the account have a valid number or correct number
+        if(login_acc == null){
+            System.out.println("Phone number not found.");
+            return null;
+        }
+        // check if pin is good
+        if(login_acc.getPin() != pin){
+            System.out.println("Incorrect Pin.");
+            return null;
+        }
+        //if they fit the requirement
+        System.out.println("Login Successfully");
+        return login_acc;
+    }
 }

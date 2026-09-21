@@ -10,9 +10,7 @@ public class Account {
     private String accountType;
     private BigDecimal balance;
 
-
     public Account() {
-
     }
 
     public Account(long id, String accountNumber,long userId,String accountType, BigDecimal balance ){

@@ -6,6 +6,10 @@ import org.example.model.User;
 public class AuthService {
     private final UserDao userDao;
 
+    // Login attempt variables
+    private int failedAttempts = 0;
+    private long blockedUntil = 0;
+
     // Constructor
     public AuthService(UserDao userDao) {
         this.userDao = userDao;
@@ -38,22 +42,73 @@ public class AuthService {
 
     // for login by using phone number and pin
     public User userLogin(String phoneNumber, int pin) {
+
+        // Check if login is currently blocked
+        if (System.currentTimeMillis() < blockedUntil) {
+
+            long remaining =
+                    (blockedUntil - System.currentTimeMillis()) / 1000;
+
+            System.out.println(
+                    "Login is blocked. Please wait "
+                            + (remaining + 1)
+                            + " seconds."
+            );
+
+            return null;
+        }
+
         User loginAcc = userDao.findByPhoneNumber(phoneNumber);
 
-        // Check if the account have a valid number or correct number
+        // Phone number not found
         if (loginAcc == null) {
+
+            failedAttempts++;
+
             System.out.println("Phone number not found.");
+            checkLoginAttempts();
+
             return null;
         }
 
-        // check if pin is good
+        // Incorrect PIN
         if (loginAcc.getPin() != pin) {
+
+            failedAttempts++;
+
             System.out.println("Incorrect Pin.");
+            checkLoginAttempts();
+
             return null;
         }
 
-        // if they fit the requirement
+        // Login successful
+        failedAttempts = 0;
+
         System.out.println("Login Successfully");
+
         return loginAcc;
     }
-}
+
+    private void checkLoginAttempts() {
+
+        System.out.println(
+                "Failed attempts: " + failedAttempts + "/3"
+        );
+
+        if (failedAttempts >= 3) {
+
+            blockedUntil =
+                    System.currentTimeMillis() + 10_000;
+
+            System.out.println(
+                    "Too many failed login attempts."
+            );
+
+            System.out.println(
+                    "Login blocked for 10 seconds."
+            );
+        }
+    }
+    }
+

@@ -57,7 +57,7 @@ public class AccountDao {
         PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setLong(1, id);
 
-            try(ResultSet resultSet = statement.getResultSet()){
+            try(ResultSet resultSet = statement.executeQuery()){
                 if(resultSet.next()){
                     return mapAccount(resultSet);
                 }
@@ -95,7 +95,7 @@ public class AccountDao {
         List<Account> accounts = new ArrayList<>();
 
         String sql = """
-                SELECT id, account_number, user-id, account_type, balance
+                SELECT id, account_number, user_id, account_type, balance
                 FROM accounts
                 WHERE user_id = ?
                 """;
@@ -124,7 +124,7 @@ public class AccountDao {
         try(Connection connection = DatabaseConnection.getConnection();
         PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setBigDecimal(1, newBalance);
-            statement.setLong(1,accountId);
+            statement.setLong(2,accountId);
 
             return statement.executeUpdate() > 0;
         }catch(SQLException e){

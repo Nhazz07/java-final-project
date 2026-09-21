@@ -66,4 +66,16 @@ public class Transaction {
     public LocalDateTime getCreatedAt(){
         return createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", accountId=" + accountId +
+                ", type='" + type + '\'' +
+                ", amount=" + amount +
+                ", relatedAccount='" + relatedAccount + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

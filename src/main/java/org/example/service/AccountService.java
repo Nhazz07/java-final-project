@@ -1,16 +1,22 @@
 package org.example.service;
 
 import org.example.dao.AccountDao;
+import org.example.dao.TransactionDao;
 import org.example.model.Account;
+import org.example.model.Transaction;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 public class AccountService {
 
-    private AccountDao accountDao;
-    public AccountService() {
-        this.accountDao = new AccountDao();
+    private final AccountDao accountDao;
+    private final TransactionDao transactionDao;
+    public AccountService(AccountDao accountDao, TransactionDao transactionDao ) {
+        this.accountDao = accountDao;
+        this.transactionDao = transactionDao;
     }
+
 
     // 1. Create a new account
     public boolean createAccount(Account account) {
@@ -46,7 +52,26 @@ public class AccountService {
             return false;
         }
         BigDecimal newBalance = account.getBalance().add(amount);
-        return accountDao.updateBalance(accountId, newBalance);
+
+        boolean balanceUpdated = accountDao.updateBalance(accountId, newBalance);
+
+        if(!balanceUpdated) {
+            return false;
+        }
+
+        // create deposit transaction
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(accountId);
+        transaction.setType("DEPOSIT");
+        transaction.setAmount(amount);
+        transaction.setRelatedAccount(null);
+
+        boolean transactionSaved = transactionDao.save(transaction);
+
+        if(!transactionSaved){
+            System.out.println("Warning: Deposit completed but transaction not recorded");
+        }
+        return true;
     }
 
     // 6. Withdraw money
@@ -65,6 +90,26 @@ public class AccountService {
             return false;
         }
         BigDecimal newBalance = currentBalance.subtract(amount);
-        return accountDao.updateBalance(accountId, newBalance);
+
+        boolean balanceUpdated = accountDao.updateBalance(accountId,newBalance);
+
+        if(!balanceUpdated){
+            return false;
+        }
+
+        // create withdrawal transaction
+        Transaction transaction = new Transaction();
+
+        transaction.setAccountId(accountId);
+        transaction.setType("WITHDRAW");
+        transaction.setAmount(amount);
+        transaction.setRelatedAccount(null);
+
+        boolean transactionSaved = transactionDao.save(transaction);
+
+        if(!transactionSaved){
+            System.out.println("Warning: Withdrawal completed but transaction was not recorded");
+        }
+        return true;
     }
 }

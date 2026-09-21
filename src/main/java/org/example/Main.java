@@ -4,6 +4,7 @@ import org.example.dao.AccountDao;
 import org.example.dao.TransactionDao;
 import org.example.dao.UserDao;
 import org.example.model.Account;
+import org.example.model.Transaction;
 import org.example.model.User;
 import org.example.service.AccountService;
 import org.example.service.AuthService;
@@ -19,8 +20,8 @@ public class Main {
      static AccountDao accountDao = new AccountDao();
      static TransactionDao transactionDao = new TransactionDao();
      static AuthService authService = new AuthService(userDao);
-     static AccountService accountService = new AccountService();
-     TransactionService transactionService = new TransactionService(accountDao, transactionDao);
+     static AccountService accountService = new AccountService(accountDao,transactionDao);
+     static TransactionService transactionService = new TransactionService(accountDao, transactionDao);
     public static void main(String[] args) {
 
 
@@ -82,6 +83,7 @@ public class Main {
             // Login successful
             if (loggedInUser != null) {
                 atmMenu(loggedInUser);
+                return;
             }else{
                 // Login failed
                 System.out.println("Login failed. Please try again.");
@@ -133,6 +135,10 @@ public class Main {
 
                 case 6 -> {
                     transactionHistory(loggedInUser);
+                }
+                case 7 -> {
+                    System.out.println("Logged out");
+                    return;
                 }
 
                 default -> {
@@ -223,11 +229,130 @@ public class Main {
     }
 
     private static void withdraw(User loggedInUser) {
+        List<Account> accounts = accountService.getUserAccount(loggedInUser.getId());
+
+        if(accounts.isEmpty()){
+            System.out.println("You don't have any account");
+            return;
+        }
+        System.out.println("===== WITHDRAW =====");
+        for(int i = 0; i < accounts.size(); i++){
+            Account account = accounts.get(i);
+            System.out.println((i + 1) + ". " + account.getAccountNumber() + "- Balance: $" + account.getBalance());
+        }
+        System.out.println("Enter your choice");
+        int choice = input.nextInt();
+
+        if(choice < 1 || choice > accounts.size()){
+            System.out.println("Invalid account");
+            input.nextLine();
+            return;
+        }
+        Account selectedAccount = accounts.get(choice - 1);
+        System.out.println("Enter withdraw amount");
+        BigDecimal amount = input.nextBigDecimal();
+        input.nextLine();
+
+        boolean success = accountService.withdraw(selectedAccount.getId(), amount);
+        if(success){
+            System.out.println("Withdraw successful");
+        }else{
+            System.out.println("Withdraw failed");
+        }
     }
 
     private static void transfer(User loggedInUser) {
+        List<Account> accounts = accountService.getUserAccount(loggedInUser.getId());
+        if(accounts.isEmpty()){
+            System.out.println("You don't have any bank account");
+            return;
+        }
+        System.out.println("===== TRANSFER =====");
+        for(int i = 0; i < accounts.size(); i++){
+Account account = accounts.get(i);
+
+            System.out.println((i + 1) + ". " + " - Balance: $" + account.getBalance());
+        }
+
+        System.out.println("Choose Sender account: ");
+        int choice = input.nextInt();
+        input.nextLine();
+
+        if(choice < 1 || choice > accounts.size()){
+            System.out.println("Invalid amount");
+            return;
+        }
+
+        Account senderAccount = accounts.get(choice - 1);
+
+        System.out.println("Enter receiver account number: ");
+        String receiverAccount = input.nextLine();
+
+
+        System.out.println("Enter amount: ");
+        BigDecimal amount = input.nextBigDecimal();
+        input.nextLine();
+
+        boolean success = transactionService.transfer(senderAccount.getId(), amount,receiverAccount);
+        if(success){
+            System.out.println("Transfer completed.");
+        }else{
+            System.out.println("Transfer failed.");
+        }
     }
 
     private static void transactionHistory(User loggedInUser) {
+
+        List<Account> accounts =
+                accountService.getUserAccount(loggedInUser.getId());
+
+        if (accounts.isEmpty()) {
+            System.out.println("You don't have any bank account.");
+            return;
+        }
+
+        System.out.println("\n===== TRANSACTION HISTORY =====");
+
+        for (int i = 0; i < accounts.size(); i++) {
+            Account account = accounts.get(i);
+
+            System.out.println(
+                    (i + 1) + ". " +
+                            account.getAccountNumber() +
+                            " - " +
+                            account.getAccountType()
+            );
+        }
+
+        System.out.print("Choose account: ");
+        int choice = input.nextInt();
+        input.nextLine();
+
+        if (choice < 1 || choice > accounts.size()) {
+            System.out.println("Invalid account.");
+            return;
+        }
+
+        Account selectedAccount = accounts.get(choice - 1);
+
+        List<Transaction> transactions =
+                transactionService.getTransactionHistory(
+                        selectedAccount.getId()
+                );
+
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions found.");
+            return;
+        }
+
+        System.out.println("\n===== TRANSACTIONS =====");
+        System.out.println("Account: " + selectedAccount.getAccountNumber());
+        System.out.println("--------------------------------");
+
+        for (Transaction transaction : transactions) {
+            System.out.println(transaction);
+        }
+
+        System.out.println("--------------------------------");
     }
 }

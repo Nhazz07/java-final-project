@@ -3,11 +3,14 @@ package org.example;
 import org.example.dao.AccountDao;
 import org.example.dao.TransactionDao;
 import org.example.dao.UserDao;
+import org.example.model.Account;
 import org.example.model.User;
 import org.example.service.AccountService;
 import org.example.service.AuthService;
 import org.example.service.TransactionService;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -140,13 +143,83 @@ public class Main {
     }
 
     private static void createAccount(User loggedInUser) {
+        System.out.println("===== CREATE ACCOUNT =====");
+        System.out.print("Enter account number: ");
+        String accountNumber = input.nextLine();
+        System.out.print("Enter account type: ");
+        String accountType = input.nextLine();
+        System.out.println("Enter initial deposit: ");
+        BigDecimal balance = input.nextBigDecimal();
+        input.nextLine();
 
+        Account account = new Account();
+
+        account.setAccountNumber(accountNumber);
+        account.setUserId(loggedInUser.getId());
+        account.setAccountType(accountType);
+        account.setBalance(balance);
+
+        boolean created = accountService.createAccount(account);
+
+        if(created){
+            System.out.println("Account created successfully!");
+            System.out.println("Your Account ID: " + account.getId());
+            System.out.println("Your Account Number: " + account.getAccountNumber());
+        }else{
+            System.out.println("Failed to create account");
+        }
     }
 
     private static void checkBalance(User loggedInUser) {
+        List<Account> accounts = accountService.getUserAccount(loggedInUser.getId());
+
+        if(accounts.isEmpty()){
+            System.out.println("You don't have any bank account");
+            return;
+        }
+
+        for(Account acc : accounts){
+            System.out.println("Account Number: " + acc.getAccountNumber());
+            System.out.println("Account type: " + acc.getAccountType());
+            System.out.println("Balance: $" + acc.getBalance());
+            System.out.println("-------------------------------");
+        }
     }
 
     private static void deposit(User loggedInUser) {
+        List<Account> accounts = accountService.getUserAccount(loggedInUser.getId());
+
+        if(accounts.isEmpty()){
+            System.out.println("You don't have an account");
+            return;
+        }
+        System.out.println("===== DEPOSIT =====");
+        for(int i = 0; i < accounts.size(); i++){
+            Account account = accounts.get(i);
+            System.out.println((i + 1) + ". " + account.getAccountNumber() + " - Balance: $" + account.getBalance());
+        }
+        System.out.println("Choose account");
+        int choice = input.nextInt();
+
+        if(choice < 1 || choice > accounts.size()){
+            System.out.println("Invalid account");
+            input.nextLine();
+            return;
+        }
+        Account selectedAccount = accounts.get(choice - 1);
+
+        System.out.println("Enter deposit amount: ");
+        BigDecimal amount = input.nextBigDecimal();
+        input.nextLine();
+
+        boolean success = accountService.deposit(
+                selectedAccount.getId(), amount
+        );
+        if(success){
+            System.out.println("deposit successful");
+        }else{
+            System.out.println("deposit failed");
+        }
     }
 
     private static void withdraw(User loggedInUser) {

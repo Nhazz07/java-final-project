@@ -154,7 +154,7 @@ public class Main {
         String accountNumber = input.nextLine();
         System.out.print("Enter account type: ");
         String accountType = input.nextLine();
-        System.out.println("Enter initial deposit: ");
+        System.out.print("Enter initial deposit: ");
         BigDecimal balance = input.nextBigDecimal();
         input.nextLine();
 
@@ -204,7 +204,7 @@ public class Main {
             Account account = accounts.get(i);
             System.out.println((i + 1) + ". " + account.getAccountNumber() + " - Balance: $" + account.getBalance());
         }
-        System.out.println("Choose account");
+        System.out.print("Choose account");
         int choice = input.nextInt();
 
         if(choice < 1 || choice > accounts.size()){
@@ -214,7 +214,7 @@ public class Main {
         }
         Account selectedAccount = accounts.get(choice - 1);
 
-        System.out.println("Enter deposit amount: ");
+        System.out.print("Enter deposit amount: ");
         BigDecimal amount = input.nextBigDecimal();
         input.nextLine();
 
@@ -240,7 +240,7 @@ public class Main {
             Account account = accounts.get(i);
             System.out.println((i + 1) + ". " + account.getAccountNumber() + "- Balance: $" + account.getBalance());
         }
-        System.out.println("Enter your choice");
+        System.out.print("Enter your choice");
         int choice = input.nextInt();
 
         if(choice < 1 || choice > accounts.size()){
@@ -249,7 +249,7 @@ public class Main {
             return;
         }
         Account selectedAccount = accounts.get(choice - 1);
-        System.out.println("Enter withdraw amount");
+        System.out.print("Enter withdraw amount");
         BigDecimal amount = input.nextBigDecimal();
         input.nextLine();
 
@@ -274,7 +274,7 @@ Account account = accounts.get(i);
             System.out.println((i + 1) + ". " + " - Balance: $" + account.getBalance());
         }
 
-        System.out.println("Choose Sender account: ");
+        System.out.print("Choose Sender account: ");
         int choice = input.nextInt();
         input.nextLine();
 
@@ -285,7 +285,7 @@ Account account = accounts.get(i);
 
         Account senderAccount = accounts.get(choice - 1);
 
-        System.out.println("Enter receiver account number: ");
+        System.out.print("Enter receiver account number: ");
         String receiverAccount = input.nextLine();
 
 

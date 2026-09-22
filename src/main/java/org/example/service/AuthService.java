@@ -28,7 +28,7 @@ public class AuthService {
         user.setPhoneNumber(phoneNumber);
         user.setPin(pin);
 
-        // save to user regi info to database
+        // save to user register info to database
         boolean savedInfo = userDao.save(user);
 
         if (savedInfo) {

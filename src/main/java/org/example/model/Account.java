@@ -7,18 +7,24 @@ public class Account {
     private long id;
     private String accountNumber;
     private long userId;
+    private String accountType;
     private BigDecimal balance;
 
-    public Account(long id, String accountNumber,long userId, BigDecimal balance ){
+    public Account() {
+    }
+
+    public Account(long id, String accountNumber,long userId,String accountType, BigDecimal balance ){
         this.id = id;
         this.accountNumber = accountNumber;
         this.userId = userId;
+        this.accountType = accountType;
         this.balance = balance;
     }
 
-    public Account(String accountNumber, long userId, BigDecimal balance){
+    public Account(String accountNumber, long userId,String accountType, BigDecimal balance){
         this.accountNumber = accountNumber;
         this.userId = userId;
+        this.accountType = accountType;
         this.balance = balance;
     }
 
@@ -29,8 +35,11 @@ public class Account {
     public void setAccountNumber(String accountNumber){
         this.accountNumber = accountNumber;
     }
-    public void setUserId(){
+    public void setUserId(long userId){
         this.userId = userId;
+    }
+    public void setAccountType(String accountType){
+        this.accountType = accountType;
     }
     public void setBalance(BigDecimal balance){
         this.balance = balance;
@@ -45,6 +54,9 @@ public class Account {
     }
     public long getUserId(){
         return userId;
+    }
+    public String getAccountType(){
+        return accountType;
     }
     public BigDecimal getBalance(){
         return balance;
